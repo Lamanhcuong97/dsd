@@ -33,13 +33,10 @@ class LoginController extends Controller
         curl_close($ch);
     
         $user = json_decode($result);
-        // dd($user);
         
         $userId = $user->user->userId;
-        // dd($userId);
 
         $userDepartment = $this->get_web_page("http://18.217.21.235:8083/api/v1/userOrganization/findByUserId?userId=" . $userId);
-        // dd($userDepartment[0]);
         
         if ($userDepartment[0]->positionId === 1 || $userDepartment[0]->positionId === 2) {
             return redirect()->route('ds_congviec_thuong_xuyen_cty');

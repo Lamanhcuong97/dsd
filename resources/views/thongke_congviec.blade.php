@@ -46,7 +46,6 @@ Danh sách project
   <?php 
   // công việc thường xuyên
   $result = file_get_contents('https://falling-frog-38743.pktriot.net/api/recurrent-tasks/');
-  dd($result);
   $list_recurrent_task = json_decode($result);
   $numberTasks = count($list_recurrent_task);
 
@@ -112,37 +111,42 @@ Danh sách project
 
 
 // Công việc dự án
- $response_project = file_get_contents("http://3.1.20.54/v1/projects");
- $response_project = json_decode($response_project);
- $list_project = $response_project->results;
+//  $response_project = file_get_contents("http://3.1.20.54/v1/projects");
+//  $response_project = json_decode($response_project);
+//  $list_project = $response_project->results;
 
- $numberProject = count($list_project);
- $numberProjectsFinished = 0; 
- $numberProjectsDoing =0;
- $numberProjectsOverdue=0;
- for ($i=0; $i <count($list_project) ; $i++) { 
-  if($list_project[$i]->status=='processing'){
-    $numberProjectsDoing = $numberProjectsDoing +1;
-  }else if($list_project[$i]->status=='completed'){
-   $numberProjectsFinished = $numberProjectsFinished +1;
- }
+//  $numberProject = count($list_project);
+//  $numberProjectsFinished = 0; 
+//  $numberProjectsDoing =0;
+//  $numberProjectsOverdue=0;
+//  for ($i=0; $i <count($list_project) ; $i++) { 
+//   if($list_project[$i]->status=='processing'){
+//     $numberProjectsDoing = $numberProjectsDoing +1;
+//   }else if($list_project[$i]->status=='completed'){
+//    $numberProjectsFinished = $numberProjectsFinished +1;
+//  }
  
- else if($list_project[$i]->status=='overdue'){
-   $numberProjectsOverdue = $numberProjectsOverdue +1;
- }
-}
+//  else if($list_project[$i]->status=='overdue'){
+//    $numberProjectsOverdue = $numberProjectsOverdue +1;
+//  }
+// }
 
+ $project_statistics = json_decode(file_get_contents('http://3.1.20.54/v1/projects/statistics'));
+ $completed = $project_statistics->completed_not_expired + $project_statistics->completed_expired;
+ $processing = $project_statistics->processing_not_expired;
+ $overdue = $project_statistics->processing_expired;
+ $total_project = $completed + $processing + $overdue;
 
 // công việc quy trình
-$response = file_get_contents("http://morning-oasis-29841.herokuapp.com/api/main-task");
-$response = json_decode($response);
-$list_MainTask = $response;
+ $response = file_get_contents("http://morning-oasis-29841.herokuapp.com/api/main-task");
+ $response = json_decode($response);
+ $list_MainTask = $response;
 
-$numberMainTask = count($list_MainTask);
-$numberMainTaskFinished = 0; 
-$numberMainTaskDoing =0;
-$numberMainTaskOverdue=0;
-for ($i=0; $i <count($list_MainTask) ; $i++) { 
+ $numberMainTask = count($list_MainTask);
+ $numberMainTaskFinished = 0; 
+ $numberMainTaskDoing =0;
+ $numberMainTaskOverdue=0;
+ for ($i=0; $i <count($list_MainTask) ; $i++) { 
   if($list_MainTask[$i]->status=='0'){
     $numberMainTaskDoing = $numberMainTaskDoing +1;
   }else if($list_MainTask[$i]->status=='1'){
@@ -289,16 +293,16 @@ for ($i=0; $i <count($list_MainTask) ; $i++) {
 
       <tr>
         <td>
-          <a href="{{ route('list_project')}}"><button type="button" class="btn btn-block btn-primary"><?php echo $numberProject ;?></button></a>
+          <a href="{{ route('list_project')}}"><button type="button" class="btn btn-block btn-primary"><?= $total_project ?></button></a>
         </td>
         <td>
-          Tổng dứ án
+          Tổng dự án
         </td>
 
       </tr>
       <tr>
         <td>
-          <a href="{{ route('list_project')}}"><button type="button" class="btn btn-block btn-success"><?php echo $numberProjectsFinished ;?></button></a>
+          <a href="{{ route('list_project')}}"><button type="button" class="btn btn-block btn-success"><?= $completed ?></button></a>
         </td>
         <td>
           Số dứ án đã hoàn thành
@@ -307,7 +311,7 @@ for ($i=0; $i <count($list_MainTask) ; $i++) {
       </tr>
       <tr>
         <td>
-          <a href="{{ route('list_project')}}"><button type="button" class="btn btn-block btn-info"><?php echo $numberProjectsDoing ;?></button></a>
+          <a href="{{ route('list_project')}}"><button type="button" class="btn btn-block btn-info"><?= $processing ?></button></a>
         </td>
         <td>
           Số dứ án đang diễn ra
@@ -316,102 +320,102 @@ for ($i=0; $i <count($list_MainTask) ; $i++) {
       </tr>
       <tr>
         <td>
-         <a href="{{ route('list_project')}}"> <button type="button" class="btn btn-block btn-danger"><?php echo $numberProjectsOverdue ;?></button></a>
-        </td>
-        <td>
-          Số dứ án chậm tiến độ
-        </td>
-      </tr>
+         <a href="{{ route('list_project')}}"> <button type="button" class="btn btn-block btn-danger"><?= $overdue ?></button></a>
+       </td>
+       <td>
+        Số dứ án chậm tiến độ
+      </td>
+    </tr>
 
-    </table>
-  </div>
+  </table>
+</div>
 
-  <!-- /.box -->
+<!-- /.box -->
 </div>
 </div>
 
 <div class="row">
-    <div class="col-md-6">
+  <div class="col-md-6">
 
-      <!-- /.box -->
-      <!-- Donut chart -->
-      <div class="box box-primary">
-        <div class="box-header with-border">
-          <i class="fa fa-bar-chart-o"></i>
+    <!-- /.box -->
+    <!-- Donut chart -->
+    <div class="box box-primary">
+      <div class="box-header with-border">
+        <i class="fa fa-bar-chart-o"></i>
 
-          <h3 class="box-title">Công việc theo quy trình</h3>
+        <h3 class="box-title">Công việc theo quy trình</h3>
 
-          <div class="box-tools pull-right">
-            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-            </button>
+        <div class="box-tools pull-right">
+          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+          </button>
 
-          </div>
         </div>
-        <div class="box-body">
-          <div id="donut-chart-procedure" style="height: 300px;"></div>
-        </div>
-        <!-- /.box-body-->
       </div>
-
-    </div>
-    <!-- /.col -->
-
-    <div class="col-md-6">
-      <!-- Bar chart -->
-
-      <!-- /.box -->
-      <div class="box-body pad table-responsive">
-
-        <table class="table table-bordered text-center">
-          <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-
-          <tr>
-            <td>
-            <a href="{{ route('congviec_quytrinh')}}">  <button type="button" class="btn btn-block btn-primary"><?php echo $numberMainTask ;?></button></a>
-            </td>
-            <td>
-              Tổng dứ án
-            </td>
-
-          </tr>
-          <tr>
-            <td>
-               <a href="{{ route('congviec_quytrinh')}}"><button type="button" class="btn btn-block btn-success"><?php echo $numberMainTaskFinished ;?></button></a>
-            </td>
-            <td>
-              Số dứ án đã hoàn thành
-            </td>
-
-          </tr>
-          <tr>
-            <td>
-              <a href="{{ route('congviec_quytrinh')}}"> <button type="button" class="btn btn-block btn-info"><?php echo $numberMainTaskDoing ;?></button></a>
-            </td>
-            <td>
-              Số dứ án đang diễn ra
-            </td>
-
-          </tr>
-          <tr>
-            <td>
-               <a href="{{ route('congviec_quytrinh')}}"><button type="button" class="btn btn-block btn-danger"><?php echo $numberMainTaskOverdue ;?></button></a>
-            </td>
-            <td>
-              Số dứ án chậm tiến độ
-            </td>
-          </tr>
-
-        </table>
+      <div class="box-body">
+        <div id="donut-chart-procedure" style="height: 300px;"></div>
       </div>
-
-      <!-- /.box -->
+      <!-- /.box-body-->
     </div>
-    <!-- /.col -->
+
   </div>
+  <!-- /.col -->
+
+  <div class="col-md-6">
+    <!-- Bar chart -->
+
+    <!-- /.box -->
+    <div class="box-body pad table-responsive">
+
+      <table class="table table-bordered text-center">
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+
+        <tr>
+          <td>
+            <a href="{{ route('congviec_quytrinh')}}">  <button type="button" class="btn btn-block btn-primary"><?php echo $numberMainTask ;?></button></a>
+          </td>
+          <td>
+            Tổng dứ án
+          </td>
+
+        </tr>
+        <tr>
+          <td>
+           <a href="{{ route('congviec_quytrinh')}}"><button type="button" class="btn btn-block btn-success"><?php echo $numberMainTaskFinished ;?></button></a>
+         </td>
+         <td>
+          Số dứ án đã hoàn thành
+        </td>
+
+      </tr>
+      <tr>
+        <td>
+          <a href="{{ route('congviec_quytrinh')}}"> <button type="button" class="btn btn-block btn-info"><?php echo $numberMainTaskDoing ;?></button></a>
+        </td>
+        <td>
+          Số dứ án đang diễn ra
+        </td>
+
+      </tr>
+      <tr>
+        <td>
+         <a href="{{ route('congviec_quytrinh')}}"><button type="button" class="btn btn-block btn-danger"><?php echo $numberMainTaskOverdue ;?></button></a>
+       </td>
+       <td>
+        Số dứ án chậm tiến độ
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+<!-- /.box -->
+</div>
+<!-- /.col -->
+</div>
 
 <!-- SELECT2 EXAMPLE -->
 <div class="box box-default">
@@ -425,72 +429,114 @@ for ($i=0; $i <count($list_MainTask) ; $i++) {
   </div>
   <!-- /.box-header -->
   <div class="box-body">
-    <?php 
-    $a = file_get_contents('http://206.189.34.124:5000/api/group8/departments');
+
+<label>Công việc theo phòng ban</label>
+   <div class="row">
+    <div class="col-xs-12">
+      <!-- /.box -->
+
+      <div class="box">
+        <!-- /.box-header -->
+        <div class="box-body">
+
+          <br>
+          <br>
+          <table id="table_recurrent_task" class="table table-bordered table-striped">
+           <?php 
+           $a = file_get_contents('http://206.189.34.124:5000/api/group8/departments');
         // echo $a;  
-    $response = json_decode($a);
+           $response = json_decode($a);
 
-    $list_department = $response->departments;
+           $list_department = $response->departments;
 
-    ?>
-    <div class="form-group">
-      <label>Chọn phòng ban</label>
-      <select class="form-control select2" style="width: 100%;">
-        <?php for ($i =0; $i< count($list_department); $i++){?>
-          <option value="<?=$list_department[$i]->id?>"><?php echo ($list_department[$i]->department_name)?></option>
-        <?php } ?>  
+           ?>
+           <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên phòng ban</th>
+              <th>Số dự án đang thực hiện</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php $index = 1; 
+            foreach($list_department as $list_departmenta) {?>
+              <tr>
+                <td><?php  echo $index++ ;?></td>
+                <td><?=$list_departmenta->department_name ?></td>
+                <td>10</td>
 
-      </select>
+
+                <td>  
+                  <a href="{{ route('thongke_congviec_phongban',$list_departmenta->id )}}" class="btn btn-primary">Chi tiết</a>
+                </td>
+              </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+      </div>
+      <!-- /.box-body -->
     </div>
-
-
-    <div class="form-group">
-      <label>Chọn kiểu thống kê</label>
-      <select class="form-control select2" style="width: 100%;">
-        <option selected="selected">Theo ngày</option>
-        <option>Theo tuần</option>
-        <option>Theo tháng</option>
-        <option>Theo quý</option>
-        <option>Theo năm</option>
-        <option>Theo dự án</option>
-      </select>
-    </div>
-
-    <div class="col-md-4">
-      <label>Tuần</label>
-      <select class="form-control">
-        <option>Tuần 1</option> <option>Tuần 2</option> <option>Tuần 3</option> <option>Tuần 4</option> <option>Tuần 5</option> <option>Tuần 6</option> <option>Tuần 7</option> <option>Tuần 8</option> <option>Tuần 9</option> <option>Tuần 10</option> <option>Tuần 11</option> <option>Tuần 12</option> <option>Tuần 13</option> <option>Tuần 14</option> <option>Tuần 15</option> <option>Tuần 16</option> <option>Tuần 17</option> <option>Tuần 18</option> <option>Tuần 19</option> <option>Tuần 20</option> <option>Tuần 21</option> <option>Tuần 22</option> <option>Tuần 23</option> <option>Tuần 24</option> <option>Tuần 25</option> <option>Tuần 26</option> <option>Tuần 27</option> <option>Tuần 28/<option> <option>Tuần 29</option> <option>Tuần 30</option> <option>Tuần 31</option> <option>Tuần 32</option> <option>Tuần 33</option> <option>Tuần 34</option> <option>Tuần 35</option> <option>Tuần 36</option> <option>Tuần 37</option> <option>Tuần 38</option> <option>Tuần 39</option> <option>Tuần 40</option> <option>Tuần 41</option> <option>Tuần 42</option> <option>Tuần 43</option> <option>Tuần 44</option> <option>Tuần 45</option> <option>Tuần 46</option> <option>Tuần 47</option> <option>Tuần 48</option> <option>Tuần 49</option> <option>Tuần 50</option> <option>Tuần 51</option> <option>Tuần 52</option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label>Tháng</label>
-      <select class="form-control">
-        <option>Tháng 1</option>
-        <option>Tháng 2</option>
-        <option>Tháng 3</option>
-        <option>Tháng 4</option>
-        <option>Tháng 5</option>
-        <option>Tháng 6</option>
-        <option>Tháng 7</option>
-        <option>Tháng 8</option>
-        <option>Tháng 9</option>
-        <option>Tháng 10</option>
-        <option>Tháng 11</option>
-        <option>Tháng 12</option>
-
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label>Năm</label>
-      <select class="form-control">
-        <option>2019</option>
-        <option>2018</option>
-        <option>2017</option>
-        <option>2016</option>
-        <option>2015</option>
-      </select>
-    </div>
+    <!-- /.box -->
   </div>
+  <!-- /.col -->
+</div>
+
+   <div class="row">
+    <div class="col-xs-12">
+      <!-- /.box -->
+
+      <div class="box">
+        <!-- /.box-header -->
+        <div class="box-body">
+         <label>Công việc theo nhân viên</label>
+          <br>
+          <br>
+          <table id="example1" class="table table-bordered table-striped">
+           <?php 
+           $a = file_get_contents('https://dsd05-dot-my-test-project-252009.appspot.com/user/getUserInfos');
+        // echo $a;  
+           $response_user = json_decode($a);
+
+        
+
+           ?>
+           <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên Nhân viên</th>
+              <th>Số dự án đang thực hiện</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php $index = 1; 
+            foreach($response_user as $response_usera) {?>
+              <tr>
+                <td><?php  echo $index++ ;?></td>
+                <td><?=$response_usera->name ?></td>
+                <td>10</td>
+
+
+                <td>  
+                  <a href="{{ route('thongke_congviec_nhanvien',$response_usera->id)}}" class="btn btn-primary">Chi tiết</a>
+                </td>
+              </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+      </div>
+      <!-- /.box-body -->
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
+
+
+
+
+</div>
 
 
 </div>
@@ -607,13 +653,23 @@ for ($i=0; $i <count($list_MainTask) ; $i++) {
 
 
 // công việc dự án
-<?php $finishedProjectPercent =  floor(($numberProjectsFinished/$numberProject)*100); ?>
-<?php $overdueProjectPercent = floor(($numberProjectsOverdue/$numberProject)*100); ?>
-<?php $doingProjectPercent =  100 - $overdueProjectPercent - $finishedProjectPercent; ?>
 
-let finishedProjectPercent = Number(<?php echo $finishedProjectPercent; ?>);
-let doingProjectPercent = Number(<?php echo $doingProjectPercent; ?>);
-let overdueProjectPercent = Number(<?php echo $overdueProjectPercent ; ?>);
+
+<?php $finishedProjectPercent =  bcdiv(($completed / $total_project) * 100, 1, 2); ?>
+<?php $doingProjectPercent = bcdiv(($processing / $total_project) * 100, 1, 2); ?>
+<?php $overdueProjectPercent = bcdiv(($overdue / $total_project) * 100, 1, 2); ?>
+
+
+var finishedProjectPercent = Number(<?= $finishedProjectPercent ?>);
+var doingProjectPercent = Number(<?= $doingProjectPercent ?>);
+var overdueProjectPercent = Number(<?= $overdueProjectPercent ?>);
+
+if (overdueProjectPercent == 0) {
+  doingProjectPercent = (100 - parseFloat(finishedProjectPercent)).toFixed(2);
+} else {
+  overdueProjectPercent = (100 - parseFloat(finishedProjectPercent) - parseFloat(doingProjectPercent)).toFixed(2)
+}
+
 
 // Công việc theo quy trình
 <?php $finishedProcedurePercent =  floor(($numberMainTaskFinished/$numberMainTask)*100); ?>
@@ -660,10 +716,21 @@ $.plot('#donut-chart-procedure', donutDataProcedure, {
   ]
 
 // data cv dự án
-var donutData_project = [
-{ label: '', data: finishedProjectPercent, color: '#0B610B' },
-{ label: '', data: doingProjectPercent, color: '#01DFD7' },
-{ label: '', data: overdueProjectPercent, color: '#DF3A01' }
+var donutData_project =  [{
+  label: '',
+  data: finishedProjectPercent,
+  color: '#0B610B'
+},
+{
+  label: '',
+  data: doingProjectPercent,
+  color: '#01DFD7'
+},
+{
+  label: '',
+  data: overdueProjectPercent,
+  color: '#dd4b39'
+}
 ]
 
 
@@ -693,12 +760,12 @@ $.plot('#donut-chart', donutData, {
 $.plot('#donut-chart-project', donutData_project, {
   series: {
     pie: {
-      show       : true,
-      radius     : 1,
+      show: true,
+      radius: 1,
       innerRadius: 0.5,
-      label      : {
-        show     : true,
-        radius   : 2 / 3,
+      label: {
+        show: true,
+        radius: 2 / 3,
         formatter: labelFormatter,
       }
 

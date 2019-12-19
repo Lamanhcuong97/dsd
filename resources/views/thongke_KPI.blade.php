@@ -90,12 +90,20 @@
                   <?php  
                      $kpi_employees = json_decode($result)->data;
                   for ($i=0; $i < 5; $i++) { 
+                    $result_userDepartment = @file_get_contents('http://18.217.21.235:8083/api/v1/userOrganization/findByUserId?userId='. $kpi_employees[$i]->employee_id);
+                    $userDepartment = json_decode($result_userDepartment)[0];
+
+                    $result_userInfo = @file_get_contents('https://dsd05-dot-my-test-project-252009.appspot.com/user/getUserInfo?id='. $kpi_employees[$i]->employee_id);
+                    $userInfo = json_decode($result_userInfo);
+
+                    
                   ?>
                       <tr>
                         <td>{{ $i + 1}}</td>
-                        <td>{{ $kpi_employees[$i]->employee_id}}</td>
+                        <td>{{ $userInfo->name }}</td>
                         <td>Hành chính nhân sự</td>
-                        <td>{{ $kpi_employees[$i]->result}}</td>
+                        <td>{{ $userDepartment->organizationName}}</td>
+                        <!-- <td>{{ $kpi_employees[$i]->result}}</td> -->
                       </tr>
                       <?php   }?>
                   @else 
@@ -120,13 +128,20 @@
                       <?php  
                         $kpi_employees = json_decode($result)->data;
                         $index = 1;
-                      for ($i= count($kpi_employees) - 1; $i > count($kpi_employees) - 6; $i--) { 
+                      for ($i= count($kpi_employees) - 1; $i > count($kpi_employees) - 6; $i--) {
+                        
+                        $result_userDepartment = @file_get_contents('http://18.217.21.235:8083/api/v1/userOrganization/findByUserId?userId='. $kpi_employees[$i]->employee_id);
+                        $userDepartment = json_decode($result_userDepartment)[0];
+    
+                        $result_userInfo = @file_get_contents('https://dsd05-dot-my-test-project-252009.appspot.com/user/getUserInfo?id='. $kpi_employees[$i]->employee_id);
+                        $userInfo = json_decode($result_userInfo);
+    
                       ?>
                           <tr>
                             <td>{{ $index}}</td>
-                            <td>{{ $kpi_employees[$i]->employee_id}}</td>
-                            <td>Hành chính nhân sự</td>
-                            <td>{{ $kpi_employees[$i]->result}}</td>
+                            <td>{{ $userInfo->name }}</td>
+                            <td>{{ $userDepartment->organizationName}}</td>
+                            <!-- <td>{{ $kpi_employees[$i]->result}}</td> -->
                           </tr>
                           <?php   }?>
                       @else 

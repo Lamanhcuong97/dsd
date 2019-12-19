@@ -31,9 +31,6 @@ Route::post('/taocongviecnhanvien', 'RecurrentsTask@store')->name('taocongviecnh
 // Route::post('/', 'LoginController@saveToken' )->name('login_save_token');
 // Route::group(['middleware' => ['web']], function () {
 
-Route::get('/', function () {
-    return view('login');
-})->name('login');
 
 // Route::post('/', )->name('login_post');
 
@@ -85,9 +82,6 @@ Route::get('/ds_baocao', function () {
 Route::get('/ds_quytrinh', function () {
     return view('ds_quytrinh');
 })->name('ds_quytrinh');
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
 
 Route::get('/dsKPI_nhanvien', function () {
     return view('dsKPI_nhanvien');
@@ -149,5 +143,12 @@ Route::get('/create_task_project/{id}', function ($id) {
 Route::get('/chitiet_quytrinh/{id}', function ($id) {
     return view('chitiet_quytrinh', compact('id'));
 })->name('chitiet_quytrinh');
+
+Route::get('/thongke_congviec_phongban/{id}', function ($id) {
+    return view('thongke_congviec_phongban', compact('id'));
+})->name('thongke_congviec_phongban');
+Route::get('/thongke_congviec_nhanvien/{id}', function ($id) {
+    return view('thongke_congviec_nhanvien', compact('id'));
+})->name('thongke_congviec_nhanvien');
 
 // });
