@@ -42,6 +42,7 @@ class KPIManagementsController extends Controller
             }
         }
 
+
         return view('dsKPI_du_an', compact('list_kpi_projects', 'isEmpty'));
     }
 
@@ -50,6 +51,7 @@ class KPIManagementsController extends Controller
     {
         $list_kpi_project = null;
         $isEmpty = true;
+        $default_criteria = ['Tiến độ dự án', 'Chất lượng dự án', 'Quy mô mức độ dự án', 'Yếu tố kĩ thuật'];
         if (isset($request->year)) {
             $result = json_decode(@file_get_contents('http://microserviceteam2hust.000webhostapp.com/api/microservice/kpi/projects/'. $request->year .'?token=4614718215946240'));
             if(!is_null($result)){
@@ -73,13 +75,24 @@ class KPIManagementsController extends Controller
 
        
 
-        return view('chitiet_KPIduan', compact('id', 'list_kpi_project', 'kpi_standard'));
+        return view('chitiet_KPIduan', compact('id', 'list_kpi_project', 'kpi_standard', 'default_criteria'));
     }
 
-    public function update_criteria(Request $request, $id)
+    public function updateCriteria(Request $request, $id)
     {
-        dd($request);
-        $data = json_encode($request->all());
+        $results = [];
+        $results['id_project'] = $request->id_project;
+        $results['id_criteria'] = (float) $request->id_criteria;
+
+
+        for ($i = 0; $i < count($request->ratios) ; $i++) { 
+            $results['result'][$i]['reality'] = (float) $request->kpi_project[$i];
+            $results['result'][$i]['ratio'] = (float) $request->ratios[$i];
+            $results['result'][$i]['name'] = $request->name_kpi_project[$i];  
+        }
+
+        $data = json_encode($results);
+
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, 'https://microserviceteam2hust.000webhostapp.com/api/microservice/kpi/update/project');
@@ -93,23 +106,51 @@ class KPIManagementsController extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER , false);
 
-        $result = curl_exec($ch);
+        $resultUpdate = curl_exec($ch);
         if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
         }
         curl_close($ch);
 
-        return redirect()->route('chitiet_KPIduan', $id);
+        $result = json_decode(@file_get_contents('http://microserviceteam2hust.000webhostapp.com/api/microservice/kpi/project/' . $id . '?token=4614718215946240'));
+        if(!is_null($result)){
+            $list_kpi_project = $result->data;
+            $isEmpty = isset($result->data->result) ? true : false;
+            $kpi_standard = array_column((array)$list_kpi_project->standard, 'data');
+        }
+        
+        $newKPI =  json_decode($resultUpdate);
+      
+        $default_criteria = ['Tiến độ dự án', 'Chất lượng dự án', 'Quy mô mức độ dự án', 'Yếu tố kĩ thuật'];
+
+        return view('chitiet_KPIduan', compact('id', 'list_kpi_project', 'kpi_standard', 'default_criteria', 'newKPI'));
     }
 
     public function listKPIDepartments(Request $request)
     {
+        $KPI_depart_months = null;
+        $department = null;
+        $criterias_kpi_department = null;
+
        if (isset($request->sel_depart)) {
-            $KPI_depart_months = (array) json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIAllMonthOfYear?departmentId=' . $request->sel_depart . '&year=2019'))->data->timeAndKPI;
-            $department = (array) json_decode(file_get_contents('http://206.189.34.124:5000/api/group8/departments/' . $request->sel_depart))->department;
+            $result_KPI_depart_months = @file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIAllMonthOfYear?departmentId=' . $request->sel_depart . '&year=2019');
+            $result_KPI_depart_months ? $KPI_depart_months = (array) json_decode($result_KPI_depart_months)->data->timeAndKPI : '';
+
+            $result_department = @file_get_contents('http://206.189.34.124:5000/api/group8/departments/' . $request->sel_depart);
+            $result_department ? $department = (array) json_decode($result_department)->department : '';
+
+            $result_kpi_department = @file_get_contents('http://206.189.34.124:5000/api/group8/kpi_results?department_id=' . $request->sel_depart);
+            $result_kpi_department ? $criterias_kpi_department =   (array) json_decode($result_kpi_department)->kpi_results[0]->criterias : '';
+
        } else {
-            $KPI_depart_months = (array) json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIAllMonthOfYear?departmentId=1&year=2019'))->data->timeAndKPI;
-            $department = (array) json_decode(file_get_contents('http://206.189.34.124:5000/api/group8/departments/1'))->department;
+            $result_KPI_depart_months = @file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIAllMonthOfYear?departmentId=1&year=2019');
+            $result_KPI_depart_months ? $KPI_depart_months = (array) json_decode($result_KPI_depart_months)->data->timeAndKPI : '';
+
+            $result_department = @file_get_contents('http://206.189.34.124:5000/api/group8/departments/1');
+            $result_department ? $department = (array) json_decode($result_department)->department : '';
+
+            $result_kpi_department = @file_get_contents('http://206.189.34.124:5000/api/group8/kpi_results?department_id=1');
+            $result_kpi_department ? $criterias_kpi_department = (array) json_decode($result_kpi_department)->kpi_results[0]->criterias : '';
        }
        
        
@@ -119,7 +160,7 @@ class KPIManagementsController extends Controller
 
         $list_department = $response->departments;
 
-        return view('dsKPI_phongban', compact('list_department', 'KPI_depart_months', 'department'));
+        return view('dsKPI_phongban', compact('list_department', 'KPI_depart_months', 'department', 'criterias_kpi_department'));
     }
 
   

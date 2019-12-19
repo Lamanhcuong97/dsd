@@ -49,97 +49,82 @@
   <!-- SELECT2 EXAMPLE -->
   <div class="box box-default">
       <div class="box-body">
-          <canvas id="canvas" height="105"></canvas>
+          <canvas id="canvas" width="100" height="15"></canvas>
         </div>
-      <div class="table-responsive col-md-6">  
-        <h3>Xếp hạng những nhân viên có KPI cao </h3>           
-        <table class="table table-bordered ">
-            <thead>
-                <tr>
-                  <th>Xếp hạng</th>
-                  <th>Tên nhân viên</th>
-                  <th>KPI</th>
-                </tr>
-              </thead>
-              <tbody>
-                  <tr>
-                      <td>1</td>
-                      <td>Lã Mạnh Cường</td>
-                      <td>Hành chính nhân sự</td>
-                      <td>90</td>
-                    </tr>
+        <?php 
+    $result =  @file_get_contents('https://dsd10-kong.herokuapp.com/kpi-all-company?startTime=2019-10-01%2000:00:00&endTime=2019-12-30%2000:00:00');
+   
+  ?>
+
+  <div class="box box-default">
+    <div class="box-header with-border">
+        Xếp Hạng Phòng Ban và nhân viên có KPI cao nhất
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body row">
+        <div class="table-responsive col-md-6">  
+            <h3>Xếp hạng những nhân viên có KPI cao </h3>           
+            <table class="table table-bordered ">
+                <thead>
                     <tr>
-                      <td>2</td>
-                      <td>Nguyễn Chí Thanh</td>
-                      <td>Bộ phận sản xuất</td>
-                      <td>85</td>
+                      <th>Xếp hạng</th>
+                      <th>Tên nhân viên</th>
+                      <th>Phòng ban</th>
+                      <th>KPI</th>
                     </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Nguyễn Duy Kỳ</td>
-                      <td>Bộ phận nghiên cứu và phát triển </td>
-                      <td>80</td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td>Trịnh Duy Hưng</td>
-                      <td>Bộ phận đảm bảo chất lươngj</td>
-                      <td>75</td>
-                    </tr>
-                    <tr>
-                      <td>5</td>
-                      <td>Kerlor Senglao</td>
-                      <td>Bộ phận bán hàng</td>
-                      <td>65</td>
-                    </tr>
-              </tbody>
-        </table>
-      </div>
-      <div class="table-responsive col-md-6">  
-          <h3>Xếp hạng những nhân viên có KPI có thấp nhất </h3>           
-          <table class="table table-bordered ">
-              <thead>
-                  <tr>
-                    <th>Xếp hạng</th>
-                    <th>Tên nhân viên</th>
-                    <th>Phòng ban</th>
-                    <th>KPI</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td>Lã Mạnh Cường</td>
-                    <td>Hành chính nhân sự</td>
-                    <td>15</td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td>Nguyễn Chí Thanh</td>
-                    <td>Bộ phận sản xuất</td>
-                    <td>20</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td>Nguyễn Duy Kỳ</td>
-                    <td>Bộ phận nghiên cứu và phát triển </td>
-                    <td>25</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td>Trịnh Duy Hưng</td>
-                    <td>Bộ phận đảm bảo chất lươngj</td>
-                    <td>35</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td>Kerlor Senglao</td>
-                    <td>Bộ phận bán hàng</td>
-                    <td>45</td>
-                  </tr>
-                </tbody>
-          </table>
-      </div>
+                  </thead>
+                  <tbody>
+                @if($result)
+                  <?php  
+                     $kpi_employees = json_decode($result)->data;
+                  for ($i=0; $i < 5; $i++) { 
+                  ?>
+                      <tr>
+                        <td>{{ $i + 1}}</td>
+                        <td>{{ $kpi_employees[$i]->employee_id}}</td>
+                        <td>Hành chính nhân sự</td>
+                        <td>{{ $kpi_employees[$i]->result}}</td>
+                      </tr>
+                      <?php   }?>
+                  @else 
+                    <h3 style="color: blue;"> Dữ liệu chưa sẵn sàng</h3>
+                  @endif
+                  </tbody>
+            </table>
+          </div>
+          <div class="table-responsive col-md-6">  
+              <h3>Xếp hạng những nhân viên có KPI có thấp nhất </h3>           
+              <table class="table table-bordered ">
+                  <thead>
+                      <tr>
+                        <th>Xếp hạng</th>
+                        <th>Tên nhân viên</th>
+                        <th>Phòng ban</th>
+                        <th>KPI</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    @if($result)
+                      <?php  
+                        $kpi_employees = json_decode($result)->data;
+                        $index = 1;
+                      for ($i= count($kpi_employees) - 1; $i > count($kpi_employees) - 6; $i--) { 
+                      ?>
+                          <tr>
+                            <td>{{ $index}}</td>
+                            <td>{{ $kpi_employees[$i]->employee_id}}</td>
+                            <td>Hành chính nhân sự</td>
+                            <td>{{ $kpi_employees[$i]->result}}</td>
+                          </tr>
+                          <?php   }?>
+                      @else 
+                        <h3 style="color: blue;"> Dữ liệu chưa sẵn sàng</h3>
+                      @endif
+                    </tbody>
+              </table>
+          </div>
+    </div>
+  </div>
     <div class="box-header with-border">
 
 
@@ -162,174 +147,8 @@
      </div>
    </div>
    <!-- /.box-header -->
-   <div class="box-body">
-     <div class="col-md-5"></div>
-     <div class="col-md-1">
-      <label>Lọc</label>
 
-    </div>
-    <div class="col-md-3 form-inline">
-      <label for="">Phòng ban</label>
-      <select class="form-control">
-        <?php for ($i =0; $i< count($list_department); $i++){?>
-          <option value="<?=$list_department[$i]->_id?>"><?php echo ($list_department[$i]->name)?></option>
-        <?php } ?> 
-      </select>
-    </div>
-    <div class="col-md-3 form-inline">
-      <label for="">Nhân viên</label>
-      <select class="form-control">
-        <?php for ($i =0; $i< count($list_employee); $i++){?>
-          <option value="<?=$list_employee[$i]->_id?>"><?php echo ($list_employee[$i]->name)?></option>
-        <?php } ?> 
-     </select>
-   </div>
-  
-</div>
-<!-- /.row -->
-<div class="box">
-  <div class="box-header">
-    <h3 class="box-title">Bảng KPI nhân viên </h3>
-  </div>
-  <div class="box-body">
-   <table id="example1" class="table table-bordered table-striped">
-    <thead>
-      <tr>
-        <th>STT</th>
-        <th>Mã nhân viên</th>
-        <th>Tên nhân viên</th>
-        <th>Phòng ban</th>
-        <th>KPI</th>
-        <th style="width: 100px"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <th>NV01</th>
-        <th>NGuyễn Chí Thanh</th>
-        <td>Phòng hành chính nhân sự</td>
-        <td>35</td>
-        <td><a href="chitiet_KPInhanvien.blade.php">Chi tiết</a></td>
-      </tr>
-       <tr>
-       <td>2</td>
-       <th>NV02</th>
-        <th>NGuyễn Chí Hưng</th>
-       <td>Phòng hành chính nhân sự</td>
-       <td>65</td>
-       <td><a href="chitiet_KPInhanvien.blade.php">Chi tiết</a></td>
-     </tr>
-     <tr>
-      <td>3</td>
-      <th>NV01</th>
-        <th>NGuyễn Chí Kerlo</th>
-      <td>Phòng hành chính nhân sự</td>
-      <td>6</td>
-      <td><a href="chitiet_KPInhanvien.blade.php">Chi tiết</a></td>
-    </tr>
-    <tr>
-     <td>4 </td>
-     <th>NV01</th>
-        <th>NGuyễn Chí Kỳ</th>
-     <td>Phòng hành chính nhân sự</td>
-     <td>5</td>
-     <td><a href="chitiet_KPInhanvien.blade.php">Chi tiết</a></td>
-   </tr>
-   <tr>
-     <td>4 </td>
-     <th>NV01</th>
-        <th>NGuyễn Chí Cường</th>
-     <td>Phòng hành chính nhân sự</td>
-     <td>5</td>
-     <td><a href="chitiet_KPInhanvien.blade.php">Chi tiết</a></td>
-   </tr>
- </tbody>
 
-</table>
-</div>
-
-</div>
-
-<!-- /.box-body -->
-
-</div>
-<div class="box">
-  <div class="box-header">
-      <div class="col-md-4">Mã nhân viên:</div>
-      <div class="col-md-8">NV01</div>
-      <div class="col-md-4">Tên nhân viên:</div>
-      <div class="col-md-8">Nguyễn Chí Thanh</div>
-      <div class="col-md-4">Phòng ban:</div>
-      <div class="col-md-8">Phòng hành chính nhân sự</div>
-      <div class="col-md-4">Dự án:</div>
-      <div class="col-md-8">Tăng lương nhân viên</div>
-  </div>
-  <div class="box-body">
-      <table id="example1" class="table table-bordered table-striped">
-          <thead>
-              <tr>
-                  <th style="width: 40px">STT</th>
-                  <th style="width: 80px">Mã KPI</th>
-                  <th>Tên tiêu chí</th>
-                  <th style="width: 80px">Kết quả đạt được</th>
-                  <th style="width: 80px">Chỉ tiêu</th>
-                  <th style="width: 80px">Trọng số KPI</th>
-                  <th style="width: 80px">Hiệu xuất KPI (%)</th>
-
-              </tr>
-          </thead>
-          <tbody>
-              <tr>
-                  <td>1</td>
-                  <td>KPI01</td>
-                  <td>Tính lương</td>
-                  <td>35</td>
-                  <td>55</td>
-                  <td>31</td>
-                  <td>35</td>
-              </tr>
-              <tr>
-                  <td>2</td>
-                  <td>KPI02</td>
-                  <td>Chi trả bảo hiểm</td>
-                  <td>65</td>
-                  <td>55</td>
-                  <td>31</td>
-                  <td>35</td>
-              </tr>
-              <tr>
-                  <td>3</td>
-                  <td>KPI03</td>
-                  <td>Dánh giá năng xuất</td>
-                  <td>6</td>
-                  <td>55</td>
-                  <td>31</td>
-                  <td>35</td>
-              </tr>
-              <tr>
-                  <td>4</td>
-                  <td>KPI04</td>
-                  <td>Giải quyết thủ tục</td>
-                  <td>5</td>
-                  <td>55</td>
-                  <td>31</td>
-                  <td>35</td>
-              </tr>
-              <tr>
-                  <td>5</td>
-                  <td>KPI05</td>
-                  <td>Đánh giá doanh thu</td>
-                  <td>5</td>
-                  <td>55</td>
-                  <td>31</td>
-                  <td>35</td>
-              </tr>
-          </tbody>
-
-      </table>
-  </div>
-</div>
 
 </section>
 
@@ -370,6 +189,17 @@
  <script src="{{asset('bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js') }}"></script>
  <!-- SlimScroll -->
  <script src="{{asset('bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+
+ <?php 
+
+  $list_department = (array) json_decode(file_get_contents('http://206.189.34.124:5000/api/group8/departments'))->departments;
+  $list_name_depart = '';
+  foreach($list_department as $department){
+      $list_name_depart .= " '" .$department->department_name . "', ";
+      
+    }
+  
+ ?>
  <script>
   $(function () {
     window.chartColors = {
@@ -382,13 +212,20 @@
     grey: 'rgb(201, 203, 207)'
   };
   var chartData = {
-			labels: ["Office & HR", 'Production', 'Accounting', 'Sales', 'Stock', 'R&D', 'QoC'],
+			labels: [<?php echo $list_name_depart?>],
 			datasets: [ {
 				type: 'bar',
 				label: 'Số lượng nhân viên đạt chỉ tiêu KPI',
 				backgroundColor: window.chartColors.green,
 				data: [
 				80,
+				70,
+				69,
+				75,
+				95,
+				45,
+				67,
+        80,
 				70,
 				69,
 				75,
@@ -404,6 +241,13 @@
 				backgroundColor: window.chartColors.red,
 				data: [
 				20,
+				30,
+				31,
+				25,
+				5,
+				55,
+				33,
+        20,
 				30,
 				31,
 				25,

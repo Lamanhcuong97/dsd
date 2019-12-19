@@ -13,47 +13,42 @@
    <div class="box box-default">
     <div class="box-header with-border">
       <h3 class="box-title" style="margin: 20px 0;">Thống kê KPI của các phòng ban</h3>
-      <form action="" method="POST" role="form" class="form-inline">
-          <div class="form-group">
-              <label>Tiêu chí</label>
-              <select class="form-control">
-              <option>Đạt doanh số</option>
-              <option>Nhân viên thực hiện đúng nội quy</option>
-              <option>Hoàn thành công việc đúng hạn</option>
-              </select>
-          </div>
-          <div class="form-group">
-              <label>Tháng</label>
-              <select class="form-control">
-              <option>Tháng 1</option>
-              <option>Tháng 2</option>
-              <option>Tháng 3</option>
-              <option>Tháng 4</option>
-              <option>Tháng 5</option>
-              <option>Tháng 6</option>
-              <option>Tháng 7</option>
-              <option>Tháng 8</option>
-              <option>Tháng 9</option>
-              <option>Tháng 10</option>
-              <option>Tháng 11</option>
-              <option>Tháng 12</option>
+      <form action="" method="GET" role="form" class="form-inline">
+         
+        <div class="form-group">
+          <label>Tháng</label>
+          <select class="form-control" name="month" >
+            <option disabled selected value>Lựa chọn phòng ban</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 1 ? 'selected' : '') : ''}} value="1">Tháng 1</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 2 ? 'selected' : '') : ''}} value="2">Tháng 2</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 3 ? 'selected' : '') : ''}} value="3">Tháng 3</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 4 ? 'selected' : '') : ''}} value="4">Tháng 4</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 5 ? 'selected' : '') : ''}} value="5">Tháng 5</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 6 ? 'selected' : '') : ''}} value="6">Tháng 6</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 7 ? 'selected' : '') : ''}} value="7">Tháng 7</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 8 ? 'selected' : '') : ''}} value="8">Tháng 8</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 9 ? 'selected' : '') : ''}} value="9">Tháng 9</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 10 ? 'selected' : '') : ''}} value="10">Tháng 10</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 11 ? 'selected' : '') : ''}} value="11">Tháng 11</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 12 ? 'selected' : '') : ''}} value="12">Tháng 12</option>
 
-              </select>
-          </div>
-          <div class="form-group">
-              <label>Quý</label>
-              <select class="form-control">
-                <option>Quý 1</option>
-                <option>Quý 2</option>
-                <option>Quý 3</option>
-                <option>Quý 4</option>
-                </select>
-          </div>
-          <div class="form-group">
-              <label>Năm</label>
-              <input type="number" class="form-control" min="2000" max="2099" step="1" value="2019" />
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Quý</label>
+          <select class="form-control" name="quarter">
+            <option disabled selected value>Lựa chọn quý</option>
+            <option {{ isset($_GET['quarter']) ? ( $_GET['quarter'] == 1 ? 'selected' : '') : ''}} value="1">Quý 1</option>
+            <option {{ isset($_GET['quarter']) ? ( $_GET['quarter'] == 2 ? 'selected' : '') : ''}} value="2">Quý 2</option>
+            <option {{ isset($_GET['quarter']) ? ( $_GET['quarter'] == 3 ? 'selected' : '') : ''}} value="3">Quý 3</option>
+            <option {{ isset($_GET['quarter']) ? ( $_GET['quarter'] == 4 ? 'selected' : '') : ''}} value="4">Quý 4</option>
+            </select>
+      </div>
+      <div class="form-group">
+          <label>Năm</label>
+      <input type="number" class="form-control" min="2000" max="2099" name="year" step="1" value="{{ $_GET['year'] ?? 2019}}" />
 
-          </div>
+      </div>
 
           <button type="submit" class="btn btn-primary">Lọc <i class="fa fa-refresh"></i></button>
       </form>
@@ -68,6 +63,10 @@
       <canvas id="canvas" height="105"></canvas>
     </div>
   </div>
+  <?php 
+    $result =  @file_get_contents('https://dsd10-kong.herokuapp.com/kpi-all-company?startTime=2019-10-01%2000:00:00&endTime=2019-12-30%2000:00:00');
+   
+  ?>
 
   <div class="box box-default">
     <div class="box-header with-border">
@@ -82,40 +81,26 @@
                     <tr>
                       <th>Xếp hạng</th>
                       <th>Tên nhân viên</th>
+                      <th>Phòng ban</th>
                       <th>KPI</th>
                     </tr>
                   </thead>
                   <tbody>
+                @if($result)
+                  <?php  
+                     $kpi_employees = json_decode($result)->data;
+                  for ($i=0; $i < 5; $i++) { 
+                  ?>
                       <tr>
-                          <td>1</td>
-                          <td>Lã Mạnh Cường</td>
-                          <td>Hành chính nhân sự</td>
-                          <td>90</td>
-                        </tr>
-                        <tr>
-                          <td>2</td>
-                          <td>Nguyễn Chí Thanh</td>
-                          <td>Bộ phận sản xuất</td>
-                          <td>85</td>
-                        </tr>
-                        <tr>
-                          <td>3</td>
-                          <td>Nguyễn Duy Kỳ</td>
-                          <td>Bộ phận nghiên cứu và phát triển </td>
-                          <td>80</td>
-                        </tr>
-                        <tr>
-                          <td>4</td>
-                          <td>Trịnh Duy Hưng</td>
-                          <td>Bộ phận đảm bảo chất lươngj</td>
-                          <td>75</td>
-                        </tr>
-                        <tr>
-                          <td>5</td>
-                          <td>Kerlor Senglao</td>
-                          <td>Bộ phận bán hàng</td>
-                          <td>65</td>
-                        </tr>
+                        <td>{{ $i + 1}}</td>
+                        <td>{{ $kpi_employees[$i]->employee_id}}</td>
+                        <td>Hành chính nhân sự</td>
+                        <td>{{ $kpi_employees[$i]->result}}</td>
+                      </tr>
+                      <?php   }?>
+                  @else 
+                    <h3 style="color: blue;"> Dữ liệu chưa sẵn sàng</h3>
+                  @endif
                   </tbody>
             </table>
           </div>
@@ -131,36 +116,22 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>Lã Mạnh Cường</td>
-                        <td>Hành chính nhân sự</td>
-                        <td>15</td>
-                      </tr>
-                      <tr>
-                        <td>2</td>
-                        <td>Nguyễn Chí Thanh</td>
-                        <td>Bộ phận sản xuất</td>
-                        <td>20</td>
-                      </tr>
-                      <tr>
-                        <td>3</td>
-                        <td>Nguyễn Duy Kỳ</td>
-                        <td>Bộ phận nghiên cứu và phát triển </td>
-                        <td>25</td>
-                      </tr>
-                      <tr>
-                        <td>4</td>
-                        <td>Trịnh Duy Hưng</td>
-                        <td>Bộ phận đảm bảo chất lươngj</td>
-                        <td>35</td>
-                      </tr>
-                      <tr>
-                        <td>5</td>
-                        <td>Kerlor Senglao</td>
-                        <td>Bộ phận bán hàng</td>
-                        <td>45</td>
-                      </tr>
+                    @if($result)
+                      <?php  
+                        $kpi_employees = json_decode($result)->data;
+                        $index = 1;
+                      for ($i= count($kpi_employees) - 1; $i > count($kpi_employees) - 6; $i--) { 
+                      ?>
+                          <tr>
+                            <td>{{ $index}}</td>
+                            <td>{{ $kpi_employees[$i]->employee_id}}</td>
+                            <td>Hành chính nhân sự</td>
+                            <td>{{ $kpi_employees[$i]->result}}</td>
+                          </tr>
+                          <?php   }?>
+                      @else 
+                        <h3 style="color: blue;"> Dữ liệu chưa sẵn sàng</h3>
+                      @endif
                     </tbody>
               </table>
           </div>
@@ -191,21 +162,47 @@
 
 
 <?php 
-  $kpi_depart_1 =  json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=1'))->data->kpiValue;
-  $kpi_depart_2 =  json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=2'))->data->kpiValue;
-  $kpi_depart_3 =  json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=3'))->data->kpiValue;
-  $kpi_depart_4 =  json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=4'))->data->kpiValue;
-  $kpi_depart_5 =  json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=5'))->data->kpiValue;
-  $kpi_depart_6 =  json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=6'))->data->kpiValue;
-  $kpi_depart_7 =  json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=7'))->data->kpiValue;
   
   $list_department = (array) json_decode(file_get_contents('http://206.189.34.124:5000/api/group8/departments'))->departments;
   $list_name_depart = '';
   $kpi_depart = '';
-  foreach($list_department as $department){
-   $list_name_depart .= " '" .$department->department_name . "', ";
-    $kpi_depart .=  " " . json_decode(file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=11&year=2019&departmentId=' . $department->id))->data->kpiValue . ",";
-    
+  if(isset($_GET['month']) && isset($_GET['year']) ){
+    foreach($list_department as $department){
+      $list_name_depart .= " '" .$department->department_name . "', ";
+      $result_kpi_depart =  file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month='. $_GET['month']. '&year='. $_GET['year'].'&departmentId=' . $department->id);
+      if( $result_kpi_depart != false ){
+          $data =json_decode($result_kpi_depart)->data;
+          isset($data->kpiValue) ? $kpi_depart .=  " " . $data->kpiValue . "," : '0, ';
+      }
+     
+    }
+  }elseif(isset($_GET['quarter']) && isset($_GET['year'])){
+    foreach($list_department as $department){
+      $list_name_depart .= " '" .$department->department_name . "', ";
+      $result_kpi_depart = @file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?quarter='. $_GET['quarter']. '&year='. $_GET['year'].'&departmentId=' . $department->id);
+      if( $result_kpi_depart != false ){
+          $data =json_decode($result_kpi_depart)->data;
+          isset($data->kpiValue) ? $kpi_depart .=  " " . $data->kpiValue . "," : '0, ';
+      }
+    }
+  }elseif(isset($_GET['year'])){
+    foreach($list_department as $department){
+      $list_name_depart .= " '" .$department->department_name . "', ";
+      $result_kpi_depart = @file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?year='. $_GET['year'].'&departmentId=' . $department->id);
+      if( $result_kpi_depart != false ){
+          $data =json_decode($result_kpi_depart)->data;
+          isset($data->kpiValue) ? $kpi_depart .=  " " . $data->kpiValue . "," : '0, ';
+      }
+    }
+  }else{
+    foreach($list_department as $department){
+      $list_name_depart .= " '" .$department->department_name . "', ";
+      $result_kpi_depart = @file_get_contents('http://18.217.21.235:8083/api/v1/departmentKPI/getDepartmentKPIByMonth?month=12&year=2019&departmentId=' . $department->id);
+      if( $result_kpi_depart != false ){
+          $data =json_decode($result_kpi_depart)->data;
+          isset($data->kpiValue) ? $kpi_depart .=  " " . $data->kpiValue . "," : '0, ';
+      }
+    }
   }
 
 

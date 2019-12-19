@@ -50,22 +50,7 @@
     <section class="content">
 
         <!-- SELECT2 EXAMPLE -->
-        <div class="box box-default">
-            <div class="box-header with-border">
-                <h3 class="box-title">Lọc</h3>
-            </div>
-            <div class="box-header with-border">
-            <form action="{{ route('chitiet_KPIduan', $id)}}" method="GET" role="form" class="form-inline">
-                    @csrf
-                    <div class="form-group">
-                        <label>Năm</label>
-                        <input type="number" class="form-control" name= "year" min="2000" max="2099" step="1" value="2019" />
-                    </div>
-          
-                    <button type="submit" class="btn btn-primary">Lọc <i class="fa fa-refresh"></i></button>
-                </form>
-            </div>
-        </div>
+        
         <div class="box">
             <div class="box-body ">
                 <canvas id="canvas" width="100" height="25" style="height: 500 !important;"></canvas>
@@ -74,6 +59,10 @@
         <!-- /.row -->
         <div class="box">
             <form action="{{ route('update_criteria', $list_kpi_project->id_project)}}" method="post">
+<<<<<<< HEAD
+=======
+            @csrf
+>>>>>>> 895c3d1a4b06e05cd54e268a4dde1537c83612e6
                 <div class="box-header">
                     <h3 class="box-title">Bảng thống kê kpi dự án</h3>
                     <button class="btn btn-primary" style="float: right;">Cập nhật</button>
@@ -103,10 +92,16 @@
                                 ?>
                                 <tr>
                                     <td>{{ $index++}}</td>
-                                    <td>{{ $kpi_project->name }}</td>
-                                    <td style="color: red; font-weight: bold;">{{ $kpi_standard[$index - 2] }}</td>
-                                    <td style="font-weight: bold"><input type="number" class="form-control" name="" id="" disabled value="{{ $kpi_project->data }}"></td>
-                                    <td>{{ $kpi_project->ratio }}</td>
+                                    <td>{{ $kpi_project->name }}
+                                        <input type="hidden" name="name_kpi_project[]" value="{{ $kpi_project->name }}">
+                                    </td>
+                                    <td style="color: blue; font-weight: bold;">{{ $kpi_standard[$index - 2] }}</td>
+                                   <?php  if(in_array($kpi_project->name, $default_criteria)){ ?>
+                                    <td style="font-weight: bold"><input type="number" min="0" max="1" step="0.01" class="form-control" name="kpi_project[]" id="" readonly  value="{{ $kpi_project->data }}"></td>
+                                   <?php  }else{ ?>
+                                    <td style="font-weight: bold"><input type="number" min="0" max="1" step="0.01" class="form-control" name="kpi_project[]" id=""  value="{{ $kpi_project->data }}"></td>
+                                   <?php }?>                                 
+                                    <td><input type="hidden" name="ratios[]" value="{{ $kpi_project->ratio }}">{{ $kpi_project->ratio }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -117,14 +112,25 @@
                                 <th style="width: 80px">{{ $list_kpi_project->kpi_standard }}</th>
                                 <th style="width: 80px"> {{ $list_kpi_project->kpi }}</th>
                             </tr>
+                            @if(isset($newKPI))
+                                <tr>
+                                    <th style="width: 40px"></th>
+                                    <th style="text-align: right;"></th>
+                                    <th style="width: 80px"></th>
+                                    <th colspan="2"> KPI dự án mới cập nhật thành:  {{ $newKPI->newKpiProject }}</th>
+                                </tr>
+                            @endif
                         </tfoot>
                         <input type="hidden" name="id_criteria" value="{{ $list_kpi_project->id_criteria }}">
+                        <input type="hidden" name="id_project" value="{{ $list_kpi_project->id_project }}">
 
                         <?php 
+
                             rtrim($list_name_kpi, ',') ;
                             rtrim($list_kpi_reality, ',') ;
                             rtrim($list_kpi_standard, ',') ;
-                            
+
+
                         ?>
 
                     </table>

@@ -46,8 +46,10 @@
               <!-- /.box-header -->
                   <div class="box-body">
                       <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#create_KPI">Tạo mới KPI</button>
-                      <h3 class="box-title">Quản lý KPI </h3>
-                      <div class="box box-default">
+                      <h3 class="box-title">Các tiêu chí KPI công ty </h3>
+                     <div class="row">
+                       <div class="col-md-6">
+                        <div class="box box-default">
                           <div class="box-header with-border">
                               <h3 class="box-title">KPI công ty 1 </h3>
                               <div class="box-tools pull-right">
@@ -82,6 +84,45 @@
                           <!-- /.box-body -->
   
                       </div>
+                       </div>
+                       <div class="col-md-6">
+                        <div class="box box-default">
+                          <div class="box-header with-border">
+                              <h3 class="box-title">KPI công ty 1 </h3>
+                              <div class="box-tools pull-right">
+                                  <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                              </div>
+                          </div>
+                          <!-- /.box-header -->
+                          <div class="box-body">
+                              <div class="box box-default">
+                                  <div class="box-header with-border">
+                                      <h3 class="box-title">KPI phòng ban 1 </h3>
+                                      <div class="box-tools pull-right">
+                                          <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                      </div>
+                                  </div>
+                                  <!-- /.box-header -->
+                                  <div class="box-body">
+                                      <ul>
+                                          <li>KPI 1</li>
+                                          <li>KPI 2</li>
+                                          <li>KPI 3</li>
+                                          <li>KPI 4</li>
+                                          <li>KPI 5</li>
+                                      </ul>
+  
+                                  </div>
+                                  <!-- /.box-body -->
+  
+                              </div>
+  
+                          </div>
+                          <!-- /.box-body -->
+  
+                      </div>
+                       </div>
+                     </div>
                   <!-- /.box-body -->
                   </div>
             <!-- /.box -->

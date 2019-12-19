@@ -30,6 +30,10 @@
     {{-- <script src="{{ asset('js/format_managements/index.js') }}"></script> --}}
 @endpush
 @section('content')
+<?php 
+  $result =  @file_get_contents('https://dsd10-kong.herokuapp.com/kpi-all-company?startTime=2019-10-01%2000:00:00&endTime=2019-12-30%2000:00:00');
+
+?>
 <section class="content-header">
       <h1>
         KPI phòng ban
@@ -52,13 +56,13 @@
         </div>
         <!-- /.box-header -->
         <div class="box-body">
-         <div class="col-md-8"></div>
+         <div class="col-md-6"></div>
         <?php 
         // $department_count;
         
         $department_count=count($list_department);
         ?>
-        <div class="col-md-4 form-inline">
+        <div class="col-md-8 form-inline">
         
         <form action="{{ route('dsKPI_phongban')}}" method="GET" class="form-inline">
       
@@ -70,66 +74,134 @@
               <?php } ?> 
             </select>
           </div>
+          <div class="form-group">
+            <label>Tháng</label>
+            <select class="form-control" name="month" >
+            <option disabled selected value>Lựa chọn phòng ban</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 1 ?? 'selected') : ''}} value="1">Tháng 1</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 2 ?? 'selected') : ''}} value="2">Tháng 2</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 3 ?? 'selected') : ''}} value="3">Tháng 3</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 4 ?? 'selected') : ''}} value="4">Tháng 4</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 5 ?? 'selected') : ''}} value="5">Tháng 5</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 6 ?? 'selected') : ''}} value="6">Tháng 6</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 7 ?? 'selected') : ''}} value="7">Tháng 7</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 8 ?? 'selected') : ''}} value="8">Tháng 8</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 9 ?? 'selected') : ''}} value="9">Tháng 9</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 10 ?? 'selected') : ''}} value="10">Tháng 10</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 11 ?? 'selected') : ''}} value="11">Tháng 11</option>
+            <option {{ isset($_GET['month']) ? ($_GET['month'] == 12 ?? 'selected') : ''}} value="12">Tháng 12</option>
+
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Quý</label>
+            <select class="form-control" name="quater">
+              <option disabled selected value>Lựa chọn quý</option>
+              <option {{ isset($_GET['quater']) ? ( $_GET['quater'] == 1 ?? 'selected') : ''}} value="1">Quý 1</option>
+              <option {{ isset($_GET['quater']) ? ( $_GET['quater'] == 2 ?? 'selected') : ''}} value="2">Quý 2</option>
+              <option {{ isset($_GET['quater']) ? ( $_GET['quater'] == 3 ?? 'selected') : ''}} value="3">Quý 3</option>
+              <option {{ isset($_GET['quater']) ? ( $_GET['quater'] == 4 ?? 'selected') : ''}} value="4">Quý 4</option>
+              </select>
+        </div>
+        <div class="form-group">
+            <label>Năm</label>
+        <input type="number" class="form-control" min="2000" max="2099" name="year" step="1" value="{{ $_GET['year'] ?? 2019}}" />
+
+        </div>
           <button type="submit" class="btn btn-primary">Lọc</button>
         </form>
       </div>
       </div>
       <div class="box">
         <div class="box-header">
-          <h3 class="box-title">Thống kê KPI theo các tiêu chí {{ $department['department_name']}}</h3>
-        </div>
-        <div class="box-body ">
-            <canvas id="canvas" width="100" height="25" style="height: 500 !important;"></canvas>
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="box-header">
           <h3 class="box-title">Thống kê KPI theo các tháng {{ $department['department_name']}}</h3>
         </div>
         <div class="box-body ">
-          <canvas id="kpi_depart_months" width="100" height="25" style="height: 500 !important;"></canvas>
+          <canvas id="kpi_depart_months" width="100" height="15" style="height: 500 !important;"></canvas>
         </div>
       </div>
-     
-    <!-- /.row -->
-    <div class="box">
-      <div class="box-header">
-        <h3 class="box-title">Bảng KPI chi tiết của phòng ban {{ $department['department_name']}}</h3>
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Thống kê KPI theo các tiêu chí {{ $department['department_name']}}</h3>
+        </div>
+        <div class="box-body ">
+            <canvas id="canvas" width="100" height="15" style="height: 500 !important;"></canvas>
+        </div>
       </div>
-      <div class="box-body">
-       <table id="example1" class="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Phòng ban</th>
-            <th>Tên tiêu chí</th>
-            <th>Tỉ lệ hoàn thành</th>
-            <th>Trọng số</th>
-            <th style="width: 100px"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $id = 1;
-           $a = file_get_contents('http://206.189.34.124:5000/api/group8/kpi_results?department_id='.$id);
-           $kpi = json_decode($a);
-           for ( $i=0 ; $i < count($kpi->kpi_results[0]->criterias); $i++){
-           ?>
-           <tr>
-            <td><?=$i?></td>
-            <td><?php echo $list_department[$kpi->kpi_results[0]->department_id]->department_name?></td>
-            <td> <?php echo $kpi->kpi_results[0]->criterias[$i]->name?></td>
-            <td> <?php echo $kpi->kpi_results[0]->criterias[$i]->complete_rating?></td>
-            <td> <?php echo $kpi->kpi_results[0]->criterias[$i]->ratio?></td>
-            <td><a href="chitiet_KPIphongban.blade.php">Chi tiết</a></td>
-          </tr>
-        <?php } ?>
-      
-   </tbody>
 
- </table>
-</div>
+     
+
+      <div class="box box-default">
+    <div class="box-header with-border">
+        Xếp Hạng Phòng Ban và nhân viên có KPI cao nhất
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body row">
+        <div class="table-responsive col-md-6">  
+            <h3>Xếp hạng những nhân viên có KPI cao </h3>           
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                      <th>Xếp hạng</th>
+                      <th>Tên nhân viên</th>
+                      <th>Phòng ban</th>
+                      <th>KPI</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                @if($result)
+                  <?php  
+                     $kpi_employees = json_decode($result)->data;
+
+                  for ($i=0; $i < 5; $i++) { 
+                  ?>
+                      <tr>
+                        <td>{{ $i + 1}}</td>
+                        <td>{{ $kpi_employees[$i]->employee_id}}</td>
+                        <td>Hành chính nhân sự</td>
+                        <td>{{ $kpi_employees[$i]->result}}</td>
+                      </tr>
+                      <?php   }?>
+                  @else 
+                    <h3 style="color: blue;"> Dữ liệu chưa sẵn sàng</h3>
+                  @endif
+                  </tbody>
+            </table>
+          </div>
+          <div class="table-responsive col-md-6">  
+              <h3>Xếp hạng những nhân viên có KPI có thấp nhất </h3>           
+              <table class="table table-bordered ">
+                  <thead>
+                      <tr>
+                        <th>Xếp hạng</th>
+                        <th>Tên nhân viên</th>
+                        <th>Phòng ban</th>
+                        <th>KPI</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    @if($result)
+                      <?php  
+                        $kpi_employees =  json_decode($result)->data;
+                        $index = 1;
+                      for ($i= count($kpi_employees) -1; $i > count($kpi_employees) - 6; $i--) { 
+                      ?>
+                          <tr>
+                            <td>{{ $index}}</td>
+                            <td>{{ $kpi_employees[$i]->employee_id}}</td>
+                            <td>Hành chính nhân sự</td>
+                            <td>{{ $kpi_employees[$i]->result}}</td>
+                          </tr>
+                          <?php   }?>
+                      @else 
+                        <h3 style="color: blue;"> Dữ liệu chưa sẵn sàng</h3>
+                      @endif
+                    </tbody>
+              </table>
+          </div>
+    </div>
+  </div>
+     
 
 </div>
 
@@ -196,8 +268,20 @@
 <!-- Page script -->
 
 <?php 
- 
 
+$criterias_name = '';
+
+$criterias_kpi_reality = '';
+
+$criterias_kpi_standard = '';
+
+foreach($criterias_kpi_department as $criteria_kpi_department ){
+  $criterias_name .= '"' . $criteria_kpi_department->name . '",';
+
+  $criterias_kpi_reality .= '' . $criteria_kpi_department->complete_rating . ',';
+
+  $criterias_kpi_standard .= ' 1,';
+}
 ?>
 <script>
   $(function () {
@@ -212,33 +296,44 @@
     grey: 'rgb(201, 203, 207)'
   };
   var chartData = {
-			labels: ['Đạt doanh số', 'Di đúng giờ', 'Sản lượng đạt 2tr sp', 'Số lượng sản phẩm lỗi ít', 'Hài lòng từ khách hàng', 'R&D', 'QoC'],
+			labels: [<?php echo $criterias_name;?>],
 			datasets: [{
 				type: 'line',
 				label: 'Tiêu chí KPI của công ty',
 				borderColor: window.chartColors.blue,
 				borderWidth: 2,
-				data: [
-				80,
-				69,
-				70,
-			  75,
-				90,
-				45,
-				78
-				]
+				data: [<?php echo $criterias_kpi_standard; ?>]
 			}, {
 				type: 'bar',
 				label: 'KPI từng phòng ban',
 				backgroundColor: window.chartColors.red,
+				data: [<?php echo $criterias_kpi_reality; ?>],
+				borderColor: 'white',
+				borderWidth: 2
+			}
+  ]
+
+		};
+
+    var data_kpi_depart_months = {
+			labels: ['Tháng 1', ' Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+			datasets: [ {
+				type: 'bar',
+				label: 'KPI phòng ban theo tháng',
+				backgroundColor: window.chartColors.green,
 				data: [
-				80,
-				75,
-				69,
-				75,
-				95,
-				10,
-				67
+          <?= $KPI_depart_months[1] ?>,
+					<?= $KPI_depart_months[2] ?>,
+					<?= $KPI_depart_months[3] ?>,
+					<?= $KPI_depart_months[4] ?>,
+					<?= $KPI_depart_months[5] ?>,
+					<?= $KPI_depart_months[6] ?>,
+					<?= $KPI_depart_months[7] ?>,
+          <?= $KPI_depart_months[8] ?>,
+					<?= $KPI_depart_months[9] ?>,
+					<?= $KPI_depart_months[10] ?>,
+					<?= $KPI_depart_months[11] ?>,
+					<?= $KPI_depart_months[12] ?>
 				],
 				borderColor: 'white',
 				borderWidth: 2
@@ -259,7 +354,16 @@
 					tooltips: {
 						mode: 'index',
 						intersect: true
-					}
+					},
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero:true,
+                      min: 0,
+                      max: 1   
+                  }
+              }]
+          }
 				}
 			});
 
@@ -271,7 +375,16 @@
 					tooltips: {
 						mode: 'index',
 						intersect: true
-					}
+					},
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero:true,
+                      min: 0,
+                      max: 1   
+                  }
+              }]
+          }
 				}
 			});
 		};
